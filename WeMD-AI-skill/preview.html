@@ -667,6 +667,8 @@ document.addEventListener('paste', function(e){
 function copyToWechat(){
   var h = contentEl.innerHTML;
   if (!h || contentEl.querySelector('.empty-state')) { showToast('请先粘贴 HTML 内容'); return; }
+  // 包裹白色背景层，避免微信编辑器默认黑底
+  h = '<section style="background:#fff;box-sizing:border-box;max-width:100%!important;padding:0 6px">'+h+'</section>';
   var hidden = document.createElement('div');
   hidden.contentEditable = true;
   hidden.style.cssText = 'position:fixed;left:-9999px;top:0;width:'+currentWidth+'px;';

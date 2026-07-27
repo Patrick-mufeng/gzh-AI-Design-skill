@@ -1,13 +1,13 @@
+<!--
+============================================================================
+微信公众号 HTML 排版设计规范 (DESIGN.md)
+Version: 1.0
+基于 4 篇真实公众号文章源码逆向分析
+适用：AI Agent 生成公众号兼容 HTML
+============================================================================
+-->
+
 # 微信公众号 HTML 排版设计规范
-
-> **Version 1.1** | 2026-05-31 | 基于 4 篇真实公众号文章源码逆向分析
-
-### 变更记录
-
-| 版本 | 日期 | 变更 |
-|------|------|------|
-| 1.1 | 2026-05-31 | 新增 §5.12 分隔线禁用三点式规则；强化 AI 自检流程引用 |
-| 1.0 | 2025-06-15 | 初始版本——标签规则 / CSS 白名单 / 组件配方 / 色板系统 / 暗黑模式 |
 
 ## 概述
 
@@ -37,7 +37,7 @@
 | 标签 | 用途 | 示例 |
 |------|------|------|
 | `<p>` | 段落（margin 必须清零） | `<p style="margin:0px">` |
-| `<span>` | 行内文字样式 | `<span style="color:#xxx">` |
+| `<span>` | 行内文字样式 | `<span leaf="" style="color:#xxx">`（**所有文字必须 `<span leaf="">` 包裹**） |
 | `<strong>` | 加粗 | `<strong>文字</strong>` |
 | `<em>` | 斜体 | `<em>文字</em>` |
 | `<br>` | 换行 | `<br/>` |
@@ -76,7 +76,23 @@ max-width: 100% !important;
 
 **无例外**。这是公众号渲染引擎的硬性要求。
 
-### 2.2 `<p>` 标签强制初始化
+### 2.2 `<span leaf="">` 强制包裹（核心铁律）
+
+**所有含中文的文字节点必须用 `<span leaf="">文字</span>` 包裹**，否则粘贴到公众号编辑器后文字样式会大面积丢失。这是从真实粘贴验证中得出的公众号平台行为。
+
+```
+✅ <p style="font-size:14px"><span leaf="">正文内容</span></p>
+❌ <p style="font-size:14px">正文内容</p>
+```
+
+**规则**：
+- 每个 `<p>` / `<span>` / `<strong>` / `<em>` 内的**中文字符**必须处于 `<span leaf="">` 内
+- `leaf=""` 属性值可为空，公众号编辑器识别的是属性名本身
+- 纯英文/数字/符号无 CJK 字符的节点可豁免（但建议统一包裹）
+- 代码块内文字（等宽字体区）可豁免
+- `<br>` 标签无需包裹
+
+### 2.3 `<p>` 标签强制初始化
 
 ```css
 p {
@@ -86,7 +102,7 @@ p {
 }
 ```
 
-### 2.3 所有 CSS 必须内联
+### 2.4 所有 CSS 必须内联
 
 ```
 ✅ <section style="display:flex;padding:10px;...">
@@ -396,13 +412,54 @@ transform: rotate(0deg);
 
 ### 5.5 引用/金句
 
+五种紧凑风格，按场景选用。**原则：少占空间、视觉突出、有呼吸感。**
+
+---
+
+**风格A — 左侧竖线（最经典，推荐首选）**
+
 ```html
-<section style="margin:20px 0;padding:16px;text-align:center;background:#fafafa;box-sizing:border-box;">
-  <p style="font-size:15px;font-weight:bold;color:#accent;line-height:1.9;letter-spacing:0.5px;margin:0;">
-    金句内容...
-  </p>
+<section style="margin:16px 0;padding:6px 0 6px 12px;border-left:3px solid #primary;box-sizing:border-box;max-width:100%!important;">
+  <p style="font-size:15px;font-weight:bold;color:#ink;line-height:1.85;letter-spacing:0.5px;margin:0;box-sizing:border-box;max-width:100%!important;">金句内容...</p>
 </section>
 ```
+
+**风格B — 大引号装饰（文艺气质）**
+
+```html
+<section style="margin:16px 0;position:static;box-sizing:border-box;max-width:100%!important;">
+  <p style="font-size:36px;color:#primary;line-height:0.6;margin:0 0 -8px 0;box-sizing:border-box;max-width:100%!important;">"</p>
+  <p style="font-size:14px;color:#ink;line-height:1.85;letter-spacing:0.5px;margin:0;padding:0 0 0 8px;box-sizing:border-box;max-width:100%!important;">金句内容...</p>
+</section>
+```
+
+**风格C — 渐变底色条（紧凑现代）**
+
+```html
+<section style="margin:16px 0;padding:10px 14px;background:linear-gradient(90deg, rgba(0,0,0,0.04), transparent);border-radius:4px;box-sizing:border-box;max-width:100%!important;">
+  <p style="font-size:14px;font-weight:bold;color:#ink;line-height:1.8;letter-spacing:0.5px;margin:0;box-sizing:border-box;max-width:100%!important;">金句内容...</p>
+</section>
+```
+
+**风格D — 标签徽章式（带「金句」标记）**
+
+```html
+<section style="margin:16px 0;padding:10px 14px;background:rgba(0,0,0,0.02);border-radius:6px;box-sizing:border-box;max-width:100%!important;">
+  <section style="display:inline-block;padding:2px 8px;background:#primary;color:#fff;font-size:8px;font-weight:bold;letter-spacing:1.5px;margin-bottom:6px;border-radius:3px;box-sizing:border-box;">金句</section>
+  <p style="font-size:14px;color:#ink;line-height:1.85;letter-spacing:0.5px;margin:0;box-sizing:border-box;max-width:100%!important;">金句内容...</p>
+</section>
+```
+
+---
+
+**选用指南**：
+
+| 风格 | 适用场景 | 特点 |
+|------|---------|------|
+| A 左侧竖线 | 技术/商业/严肃文章 | 经典稳重，极省空间 |
+| B 大引号 | 散文/故事/情感类 | 文艺感，大号引号有识别度 |
+| C 渐变底色 | 快节奏/新媒体文 | 现代感，视觉层次好 |
+| D 标签式 | 教程/干货/总结 | 有「划重点」心理暗示 |
 
 ### 5.6 数据展示（三列）
 
@@ -570,57 +627,67 @@ transform: rotate(0deg);
 | 底部文字 | 10px | 版权、来源等 |
 | 分割线装饰 | 12-13px | 点点点分隔 |
 
-### 5.17 主题案例
+### 5.17 代码块
 
-以下 6 个完整主题案例展示规范的上限——从极简到张扬，从温暖到冷峻。
+用于展示代码片段、配置、终端命令等。使用 `<section>` + `<p>` + `<span>` 模拟，**禁止使用 `<pre>` 和 `<code>` 标签**。
 
----
+```html
+<!-- 带语言标签的代码块 -->
+<section style="margin:16px 0;border-radius:8px;overflow:hidden;box-sizing:border-box;max-width:100%!important;">
+  <!-- 顶部栏：语言标签 -->
+  <section style="padding:8px 14px;background:rgba(0,0,0,0.75);display:flex;flex-flow:row;align-items:center;gap:8px;box-sizing:border-box;max-width:100%!important;">
+    <section style="width:10px;height:10px;border-radius:50%;background:#ff5f57;box-sizing:border-box;"></section>
+    <section style="width:10px;height:10px;border-radius:50%;background:#febc2e;box-sizing:border-box;"></section>
+    <section style="width:10px;height:10px;border-radius:50%;background:#28c840;box-sizing:border-box;"></section>
+    <p style="flex:1;text-align:right;font-size:9px;color:rgba(255,255,255,0.5);margin:0;letter-spacing:1px;box-sizing:border-box;max-width:100%!important;">python</p>
+  </section>
+  <!-- 代码内容区 -->
+  <section style="padding:14px 16px;background:rgba(0,0,0,0.85);box-sizing:border-box;max-width:100%!important;">
+    <p style="font-size:12px;font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;color:rgba(255,255,255,0.9);line-height:1.8;margin:0;white-space:pre-wrap;word-break:break-all;box-sizing:border-box;max-width:100%!important;">
+<span style="color:#c678dd;">import</span> <span style="color:#e5c07b;">requests</span>
+<span style="color:#c678dd;">import</span> <span style="color:#e5c07b;">json</span>
 
-#### 🟫 案例 1：赤墨（Red Ink）— 东方书法 × 现代排版
+<span style="color:#5c6370;"># 调用 API</span>
+<span style="color:#e5c07b;">resp</span> = <span style="color:#e5c07b;">requests</span>.post(
+    <span style="color:#98c379;">"http://localhost:5000/api/generate"</span>,
+    <span style="color:#e5c07b;">json</span>={<span style="color:#98c379;">"article"</span>: <span style="color:#98c379;">"文章内容"</span>, <span style="color:#98c379;">"theme"</span>: <span style="color:#98c379;">"cyber"</span>}
+)
+<span style="color:#c678dd;">print</span>(<span style="color:#e5c07b;">resp</span>.json()[<span style="color:#98c379;">"html"</span>])
+    </p>
+  </section>
+</section>
+```
 
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「赤墨（进阶）」**
+**两种变体**：
 
-**设计特征**：竖向装饰线替代横向分隔、标题用 serif 字重对比、引用段左边 3px 朱砂竖线、卡片底色偏暖黄像旧书页。所有设计元素围绕"一本书的阅读体验"展开。
+**变体 A — 无顶部栏（更简洁）**
+```html
+<section style="margin:16px 0;padding:14px 16px;background:rgba(0,0,0,0.05);border-radius:6px;box-sizing:border-box;max-width:100%!important;">
+  <p style="font-size:12px;font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;color:#333;line-height:1.8;margin:0;white-space:pre-wrap;word-break:break-all;box-sizing:border-box;max-width:100%!important;">$ pip install flask requests</p>
+</section>
+```
 
----
+**变体 B — 暗色终端风格（适合技术类文章）**
+```html
+<section style="margin:16px 0;border-radius:8px;overflow:hidden;box-sizing:border-box;max-width:100%!important;">
+  <section style="padding:10px 14px;background:#1e1e2e;box-sizing:border-box;max-width:100%!important;">
+    <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;letter-spacing:1px;box-sizing:border-box;max-width:100%!important;">$ terminal</p>
+  </section>
+  <section style="padding:12px 16px;background:#181825;box-sizing:border-box;max-width:100%!important;">
+    <p style="font-size:12px;font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;color:#cdd6f4;line-height:1.8;margin:0;box-sizing:border-box;max-width:100%!important;">curl -X POST http://localhost:5000/api/generate \</p>
+    <p style="font-size:12px;font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;color:#cdd6f4;line-height:1.8;margin:0;box-sizing:border-box;max-width:100%!important;">  -H "Authorization: Bearer sk-xxx" \</p>
+    <p style="font-size:12px;font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;color:#cdd6f4;line-height:1.8;margin:0;box-sizing:border-box;max-width:100%!important;">  -d '{"article":"...","theme":"cyber"}'</p>
+  </section>
+</section>
+```
 
-#### 🟦 案例 2：深海（Abyss）— 暗黑 × 荧光 × 沉浸
-
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「深海（进阶）」**
-
-**设计特征**：全暗底、电光青是唯一光源。信息卡用极微弱蓝调背景区分层次，分割线用半透明青线。强调文字用青字+0.5px 青文字阴影模拟荧光。适合科技/深度/沉浸感文章。
-
----
-
-#### 🟩 案例 3：苔原（Tundra）— 北欧极简 × 自然治愈
-
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「苔原（进阶）」**
-
-**设计特征**：一切从简。只用一种绿色，不同灰度完成层次。圆角普遍 4-6px，比默认更圆润柔和。卡片带极轻微绿色背景几乎看不出来。适合生活/治愈/慢生活类文章。
-
----
-
-#### 🟪 案例 4：紫调（Violet Hour）— 渐变 × 梦幻 × 文艺
-
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「紫调（进阶）」**
-
-**设计特征**：双强调色——紫用于结构（标题/分隔/按钮），粉玫红用于情绪（金句/引用/互动）。渐变只出现在按钮和分隔线。卡片带极淡的紫色底色。适合文艺/情感/女性向内容。
-
----
-
-#### 🟧 案例 5：暖橙（Ember）— 大地色 × 温暖 × 手作感
-
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「暖橙（进阶）」**
-
-**设计特征**：全暖色调，无冷色。信息卡背景用亚麻色（偏黄灰），强调文字用陶土橙而非正红。按钮背景用可可黑配白字，形成温暖但不轻浮的对比。适合美食/手作/旅行/生活记录。
-
----
-
-#### ⬜ 案例 6：素白（Bare）— 纯白 × 单黑 × 极致克制
-
-> 六色色板（primary/accent/surface/s2/border/ink/mute/body）见 §6.3 **「素白（进阶）」**
-
-**设计特征**：全篇只有黑白灰。无彩色，无渐变，连强调文字都是黑色加粗。层次全靠灰度和留白。信息卡用 5%浅灰底，分割线用 10%灰线。按钮用黑底白字 vs 白底黑字对比。所有圆角为 0。适合极简主义者/哲学/诗歌/高级感内容。
+**色彩规则**：
+- 代码块底色使用 `rgba(0,0,0,0.85)`（暗色）或 `rgba(0,0,0,0.05)`（亮色），根据主题选择
+- 代码文字使用等宽字体栈：`'SF Mono','Menlo','Consolas','Courier New',monospace`
+- 代码字号 11-12px，行高 1.7-1.8
+- 语法高亮通过 `<span style="color:#xxx">` 实现，使用柔和色值避免刺眼
+- 顶部栏三色圆点（红黄绿）为可选装饰，适合展示完整代码文件
+- 内联代码（行内）用 `<span style="font-family:monospace;background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;font-size:12px;">code</span>` 实现
 
 ---
 
@@ -649,7 +716,7 @@ transform: rotate(0deg);
 弱色 (mute):         副文字、标签
 ```
 
-### 6.3 十五套主题色板（9 基础 + 6 进阶）
+### 6.3 九套示例主题
 
 #### 🌸 可爱手帐
 ```
@@ -723,54 +790,6 @@ border: #e0e0e0     ink: #1a1a1a
 mute: #888          body: #1a1a1a
 ```
 
-#### 🟫 赤墨（进阶）
-```
-primary: #c23a2e    accent: #c23a2e
-surface: #faf7f4    s2: #f3ede6    s3: rgba(194,58,46,0.03)
-border: #e0d5c8     ink: #1a0f0c
-mute: #9c8880       body: #3d302c
-```
-
-#### 🟦 深海（进阶）
-```
-primary: #00e5ff    accent: #00e5ff
-surface: #060d17    s2: #0d1525    s3: rgba(0,229,255,0.04)
-border: rgba(0,229,255,0.15)  ink: #e8f0ff
-mute: #5a6a80       body: #b0c0d8
-```
-
-#### 🟩 苔原（进阶）
-```
-primary: #7cb342    accent: #7cb342
-surface: #f9fbf7    s2: #f0f4ec    s3: rgba(124,179,66,0.04)
-border: #dde4d8     ink: #1d2a1d
-mute: #889a80       body: #3a4638
-```
-
-#### 🟪 紫调（进阶）
-```
-primary: #8b5cf6    accent: #f472b6
-surface: #faf8ff    s2: #f3f0fc    s3: rgba(139,92,246,0.03)
-border: #ddd8f0     ink: #1a1530
-mute: #9088a8       body: #3d3558
-```
-
-#### 🟧 暖橙（进阶）
-```
-primary: #e8873a    accent: #e8873a
-surface: #fdf9f3    s2: #f8efe0    s3: rgba(232,135,58,0.04)
-border: #e8d5c0     ink: #2c1810
-mute: #a08878       body: #4a3530
-```
-
-#### ⬜ 素白（进阶）
-```
-primary: #000000    accent: #000000
-surface: #ffffff    s2: #f5f5f5    s3: #fafafa
-border: #e5e5e5     ink: #000000
-mute: #999999       body: #000000
-```
-
 ---
 
 ## 第七部分：排版尺度
@@ -815,10 +834,11 @@ mute: #999999       body: #000000
 1. 每个元素写 `style="box-sizing:border-box;"`
 2. 每个块级元素写 `max-width:100%!important;`
 3. `<p>` 标签写 `margin:0px;padding:0px;`
-4. 所有 transform 带 4 个厂商前缀
-5. 图片使用 `display:block;` 消除底部空隙
-6. 容器之间用 `vertical-align:middle;` 或 `top` 对齐
-7. flex 子元素写 `flex:0 0 auto;`
+4. **所有中文文字节点用 `<span leaf="">文字</span>` 包裹**（否则粘贴后样式丢失）
+5. 所有 transform 带 4 个厂商前缀
+6. 图片使用 `display:block;` 消除底部空隙
+7. 容器之间用 `vertical-align:middle;` 或 `top` 对齐
+8. flex 子元素写 `flex:0 0 auto;`
 
 ### ❌ 禁止做
 
@@ -831,14 +851,14 @@ mute: #999999       body: #000000
 7. transform 只写标准属性不写前缀
 8. 图片不写 `display:block;` 导致底部有缝隙
 9. 用 `<table>` 做布局 — 用 flex
+10. **中文文字不加 `<span leaf="">` 包裹** — 粘贴后样式整片丢失
 
 ---
 
 ## 第九部分：文章完整结构模板
 
 ```html
-<section style="width:100%;max-width:677px;background:transparent;padding:0 8px 24px;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.85;color:{{body}};letter-spacing:0.3px;box-sizing:border-box;margin:0 auto">
-  <!-- ↑ color:{{body}} 为主题正文色占位符，实际生成时替换为所选主题的 body 色值 -->
+<section style="width:100%;max-width:677px;background:transparent;padding:0 8px 24px;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.85;color:#body;letter-spacing:0.3px;box-sizing:border-box;margin:0 auto">
 
   <!-- 文章头部 -->
   ... (见 5.1)
@@ -999,104 +1019,39 @@ AI 应根据所选主题风格，自由设计文章头部和尾部卡片。
 
 ---
 
-## 附录：AI 速查卡
+## 附录：快速参考卡片
 
-> **AI 先读这里**——速查卡覆盖全部规则的索引。每个条目带 `→§` 引用，需要细节时再翻正文对应章节。不用读完 34KB 全文。
-
-### A.1 标签规则 `→§1`
-
-| ✅ 允许 | ❌ 禁止 |
-|---------|---------|
-| `<section>` 唯一块级容器 | `<div>` `<article>` `<header>` `<footer>` `<nav>` `<main>` `<aside>` |
-| `<p>` `<span>` `<strong>` `<em>` `<br/>` | `<h1>`–`<h6>` `<ul>` `<ol>` `<table>` `<blockquote>` `<a>` |
-| `<img>` `<svg>` `<foreignObject>` | `<style>` `<link>` |
-
-### A.2 三条铁律 `→§2`
-
-1. **每个元素写**: `box-sizing:border-box; max-width:100%!important;`
-2. **每个 `<p>` 写**: `margin:0px; padding:0px;`
-3. **100% 内联样式** — 禁止 `<style>` 标签、禁止 class、禁止外部 CSS
-
-### A.3 CSS 白名单 `→§3`
-
-| 类别 | ✅ 可用 | ❌ 禁止 |
-|------|---------|---------|
-| 布局 | `display:flex/inline-block/block/grid`, `flex-flow`, `flex`, `justify-content`, `align-items`, `align-self`, `grid-template-*` | — |
-| 盒模型 | `width`, `height`, `max/min-width/height`, `padding`, `margin`(支持负值), `overflow:hidden/visible` | — |
-| 文字 | `font-size:9-51px`, `line-height:0-3`, `letter-spacing:0-5px`, `text-align`, `color:#hex/rgb/rgba`, `font-weight`, `vertical-align`, `word-break`, `font-family` | — |
-| 背景 | `background-color`, `background:linear-gradient()`, `background-image:url()`, `background-position`, `background-size`(支持精确%), `background-repeat` | — |
-| 边框 | `border`, `border-*`(分侧), `border-radius`, `border-*-*-radius`(单角) | — |
-| 特效 | `text-shadow`(多阴影描边), `box-shadow`, `transform`(rotate/skew/translate/scale), `opacity`, `z-index:1-7` | `animation` `@keyframes` `transition` `filter` `backdrop-filter` `clip-path` |
-| 定位 | `position:static`(默认值，不写) | `position:relative/absolute/fixed/sticky` |
-| 单位 | `px` `%` `em` | `vw` `vh` `rem` `calc()` `var()` `clamp()` `@media` |
-| 颜色 | `#hex` `rgb()` `rgba()` | `hsl()` `oklch()` |
-
-> **transform 必须 4 前缀**: 标准 + `-webkit-` + `-moz-` + `-o-`，缺一不可 `→§3.7`
-
-### A.4 布局模式 `→§4`
-
-| # | 模式 | 核心 CSS | 用途 |
-|---|------|----------|------|
-| 1 | Flex 横向 | `display:flex;flex-flow:row` + 子元素 `display:inline-block;flex:0 0 auto` | 默认布局 |
-| 2 | Flex 纵向 | `display:flex;flex-flow:column` | 垂直堆叠 |
-| 3 | 左右分栏 | flex row + `flex:0 0 N%` + 空隙列 `flex:0 0 5%` | 精确比例分栏 |
-| 4 | Grid 叠加 | `display:grid;grid-template-columns:100%;grid-template-rows:100%` + 子元素 `grid-column-start:1;grid-row-start:1` | 伪绝对定位 |
-| 5 | SVG foreignObject | Grid + SVG `viewbox` + `<foreignObject>` 内嵌 HTML | 高级叠加(135编辑器) |
-
-### A.5 组件清单 `→§5`
-
-**每篇文章必须包含（按顺序）**: 标题区 `→§5.1` → 信息卡 `→§5.14` → 正文 `→§5.3` → 金句 `→§5.5` → 分隔 `→§5.12` → 互动卡 `→§5.15`
-
-| # | 组件 | 引用 | 关键特征 |
-|---|------|------|----------|
-| 1 | 头部标题区 | §5.1 | 标签徽章 + 标题 21-24px + 副标题 |
-| 2 | 信息卡 | §5.14 | 字数 + 阅读时间 + 标签 + 一句话概览 |
-| 3 | 章节标题 | §5.2 | 左边框 3px 装饰 + SECTION 编号 + 标题 |
-| 4 | 正文段落 | §5.3 | 14px / 1.85 行高 / justify / 0.3px 字间距 |
-| 5 | 强调卡片 | §5.4 | 渐变背景 + 左边框 4px + badge 标签 |
-| 6 | 金句/引用 | §5.5 | 居中 + 灰色背景 + 加粗 15px |
-| 7 | 数据展示 | §5.6 | flex 三列 + 大数字 28px + 标签 |
-| 8 | 步骤流(横) | §5.7 | 编号圆圈 28px + 步骤名 + 描述 |
-| 9 | 步骤流(纵) | §5.8 | 左编号 + 右文字，flex row |
-| 10 | 标签徽章 | §5.9 | flex wrap + `gap:6px` + 小圆角色块 |
-| 11 | 提示块 | §5.10 | 左边框 3px + **TIP** 前缀 |
-| 12 | CTA 按钮 | §5.11 | 渐变背景 + 大按钮 `padding:10px 28px` |
-| 13 | 分割线 | §5.12 | **1px 细线或渐变线**（禁用 `· · ·` 三点式） |
-| 14 | 图片 | §5.13 | `display:block` + `draggable="false"` + 圆角 8px + 阴影 |
-| 15 | 尾部互动卡 | §5.15 | 5 种按钮风格 A-E 可选 + emoji 图标 |
-
-### A.6 关键数值 `→§7`
-
-| 属性 | 值 | 适用场景 |
-|------|-----|----------|
-| 正文 | **14px** / 行高 **1.85** / 字间距 **0.3px** | `<p>` 段落 |
-| 文章标题 | 21–24px / 行高 1.3–1.4 | 文首大标题 |
-| 章节标题 | 15–17px | 一级分段标题 |
-| 卡片标题 | 15px | 强调卡片内标题 |
-| 标签/徽章 | 9–10px / 字间距 2px | badge、日期、编号 |
-| 微型文字 | 9px | 极小标注 |
-| 金句/引用 | 13–15px / 行高 1.8–1.9 | 居中引用 |
-| 卡片间距 | margin **20–24px** 上下 | 组件之间 |
-| 段落间距 | margin **8–10px** 上下 | 正文 `<p>` |
-| 章节间距 | margin-top **32px** | 章节标题上方 |
-| 容器两端缩进 | `padding:0 6px` | 最外层容器 |
-| 尾部呼吸空间 | padding-bottom **20–30px** | 尾部卡片底部 |
-
-### A.7 暗黑模式 `→§10`
-
-- 容器背景 `transparent` — 让微信底色透出，双模式自动适配
-- 卡片用 `rgba(0,0,0,0.03)` ~ `rgba(0,0,0,0.06)` — 半透明在两种模式下都有层次
-- 文字用深色 `#1a1a1a` / `#333` / `#555` — 暗黑模式自动反转
-- 渐变用透明停止点 — `linear-gradient(to right, rgba(0,0,0,0.06), transparent)`
-- **禁用** `@media (prefers-color-scheme: dark)` — 公众号自动处理
-
-### A.8 AI 内容处理权限 `→§11`
-
-| ✅ 允许 | ❌ 禁止 |
-|---------|---------|
-| 提取金句做成引用块 | 改变事实和数据 |
-| 拆分长段落增强节奏 | 添加原文没有的观点 |
-| 添加章节一句话提炼 | 删除关键论据 |
-| 数据句包装为数字卡片 | 改变文章立场和结论 |
-| 优化叙事结构 | — |
-| 凝练开头为导语 | — |
+```
+┌─ 布局 ─────────────────────────────────────┐
+│ display: flex | inline-block | block | grid │
+│ flex-flow: row | column                     │
+│ flex: 0 0 auto | 0 0 90%                   │
+│ justify-content: center | flex-start        │
+│ align-items: center | flex-start            │
+│ grid-template-columns/rows: 100%            │
+├─ 盒模型 ───────────────────────────────────┤
+│ box-sizing: border-box  ← 强制              │
+│ max-width: 100% !important  ← 强制          │
+│ width/height: % | px | max-content         │
+│ padding/margin: px | % | auto              │
+│ overflow: hidden | visible                 │
+├─ 文字 ─────────────────────────────────────┤
+│ font-size: 9-51px (基准14px)               │
+│ line-height: 0-3 (正文1.85)                │
+│ letter-spacing: 0-5px (正文0.3)            │
+│ text-align: center | justify | left        │
+│ color: #hex | rgb() | rgba()              │
+├─ 背景 ─────────────────────────────────────┤
+│ background-color: #xxx | rgb() | rgba()   │
+│ background: linear-gradient(方向,c1,c2)    │
+├─ 边框 ─────────────────────────────────────┤
+│ border: 1px solid #xxx                     │
+│ border-left/right/top/bottom               │
+│ border-radius: px | % | 99px              │
+├─ 特效 ─────────────────────────────────────┤
+│ text-shadow: (多阴影描边)                    │
+│ transform: rotate/skew/translate (4前缀)   │
+│ opacity: 0-1                               │
+│ z-index: 1-7                               │
+└────────────────────────────────────────────┘
+```

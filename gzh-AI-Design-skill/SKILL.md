@@ -46,22 +46,24 @@ Phase 0: 读取文章 + 分析调性
   ↓
 Phase 1: 主题选择（A预设 / B自定义 / C AI全原创）
   ↓
-Phase 2: 读设计语言 → 原创设计 → 生成 HTML
+Phase 2: 前置阅读 — 强制逐文件读取 4 个设计规范
   ↓
-Phase 3: 生成预览页 + 脚本校验
+Phase 3: 原创设计 → 生成 HTML
+  ↓
+Phase 4: 生成预览页 + 脚本校验 + 交付
   ↓
 用户: "推送" / "推到公众号"
   ↓
-推送到公众号草稿箱（API推送 或 手动复制）
+推送工作流（API推送 或 手动复制）
 ```
 
 ### 命令路由
 
 | 用户说 | 执行 |
 |--------|------|
-| "帮我排版" / "排版" / "AI排版" / "公众号排版" / "format" | Phase 0→3（排版全流程） |
-| "推送" / "push" / "推到公众号" / "推送到公众号" | Phase P（推送流程） |
-| "一条龙" / "全流程" / "排完就推" | Phase 0→3→P（排版+推送串联） |
+| "帮我排版" / "排版" / "AI排版" / "公众号排版" / "format" | Phase 0→4（排版全流程） |
+| "推送" / "push" / "推到公众号" / "推送到公众号" | 推送工作流 |
+| "一条龙" / "全流程" / "排完就推" | Phase 0→4 + 推送（排版+推送串联） |
 
 ---
 
@@ -156,10 +158,10 @@ C. AI 全原创 — 不套预设，AI 根据文章内容自主设计整套视觉
 ```
 按顺序依次读取：
 
-1. references/spec-01-tags.md     — 标签规则与强制 CSS（~110行）
-2. references/spec-02-css.md      — CSS 属性完整白名单（~165行）
-3. references/spec-03-components.md — 布局模式与组件配方（~410行）
-4. references/spec-04-design.md   — 色彩系统与设计指南（~365行）
+1. references/spec-01-tags.md     — 标签规则与强制 CSS
+2. references/spec-02-css.md      — CSS 属性完整白名单
+3. references/spec-03-components.md — 布局模式与组件配方
+4. references/spec-04-design.md   — 色彩系统与设计指南
 ```
 
 #### 自检：确认已完整读取（读完 4 个文件后必做）
@@ -360,7 +362,7 @@ python scripts/validate_gzh_html.py "output/{标题}_{日期}/output.html"
 
 ### Phase P0 · 检查凭证
 
-检查项目 `.env` 中是否配置了微信凭证：
+检查项目根目录 `.env` 文件是否存在且配置了微信凭证：
 
 ```bash
 grep -E "^WECHAT_APPID=|^WECHAT_APPSECRET=" .env 2>/dev/null || echo "MISSING"
@@ -368,23 +370,83 @@ grep -E "^WECHAT_APPID=|^WECHAT_APPSECRET=" .env 2>/dev/null || echo "MISSING"
 
 **已配置** → 进入 Phase P1。
 
-**未配置** → 自动降级为手动模式：
+**未配置或 .env 不存在** → 进入凭证引导流程：
+
+---
+
+#### 凭证引导（.env 不存在或未配置时执行）
+
+**Step 1: 创建 .env 文件**
+
+```bash
+touch .env
+```
+
+然后用 Write 写入空模板：
 
 ```
-⚠️ 微信公众号推送功能未配置。
-
-如需 API 自动推送，请在项目 .env 中添加：
-  WECHAT_APPID=wx1234567890
-  WECHAT_APPSECRET=your-secret
-  WECHAT_AUTHOR=你的作者名          # 可选，公众号文章署名
-
-获取方式：公众号后台 → 设置与开发 → 基本配置 → 开发者ID(AppID) + 开发者密码(AppSecret)
-
-📋 当前请手动操作：
-  1. 打开 output/{标题}_{日期}/output-preview.html
-  2. 点击「📋 复制到公众号」
-  3. 粘贴到公众号后台
+WECHAT_APPID=
+WECHAT_APPSECRET=
+WECHAT_AUTHOR=
 ```
+
+**Step 2: 引导用户获取凭证**
+
+```
+🔑 配置微信公众号推送需要以下信息：
+
+第一步：获取 AppID 和 AppSecret
+  1. 登录公众号后台 → https://mp.weixin.qq.com
+  2. 左侧菜单 → 设置与开发 → 基本配置
+  3. 复制「开发者ID(AppID)」
+  4. 点击「开发者密码(AppSecret)」→ 生成并复制
+     （AppSecret 只在生成时显示一次，请妥善保存）
+
+第二步：配置 IP 白名单（必须！否则推送会报 40164 错误）
+  1. 同一页面 → 「IP 白名单」
+  2. 点击「添加」
+
+现在我来帮你查公网 IP：
+
+```bash
+curl -s https://ip.sb
+```
+
+拿到 IP 后展示给用户：
+  3. 将 IP 填入白名单：{查询到的IP}
+  4. 提示：这是你当前的公网 IP，如果网络环境变化（如换 WiFi），需重新添加
+
+第三步：填入 .env
+  把获取到的值填入项目根目录的 .env 文件：
+    WECHAT_APPID=wx1234567890
+    WECHAT_APPSECRET=你的32位密钥
+    WECHAT_AUTHOR=你的作者名
+
+填好后告诉我，我来确认配置是否正确。
+```
+
+**Step 3: 验证配置**
+
+用户填好后，重新运行检查命令：
+
+```bash
+grep -E "^WECHAT_APPID=|^WECHAT_APPSECRET=" .env
+```
+
+- 两行都有值且 AppID 以 `wx` 开头 → 进入 Phase P1
+- 仍是空值 → 提示用户填好后重试，不阻塞（可先手动复制粘贴）
+
+---
+
+**快速参考（已配置但用户忘记来源）**：
+
+| 项目 | 地址 | 做什么 |
+|------|------|--------|
+| 公众号后台 | https://mp.weixin.qq.com | 设置与开发 → 基本配置 |
+| AppID | 基本配置页直接显示 | 以 `wx` 开头的字符串 |
+| AppSecret | 点击「生成」后显示一次 | 32 位十六进制密钥 |
+| IP 白名单 | 基本配置页 → IP 白名单 | 添加你服务器的公网 IP |
+| 查公网 IP | https://ip.sb | 浏览器打开即可看到
 
 ### Phase P1 · 确认推送
 

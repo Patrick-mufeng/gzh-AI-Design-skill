@@ -217,13 +217,13 @@
           <div class="speaker-slit"></div>
           <div class="dynamic-island"></div>
           <div class="statusbar"><span id="timeLabel">9:41</span><span style="font-size:9px">▮▮▮▮ &nbsp;⋮⋮⋮⋮</span></div>
-          <div class="content" id="content">
-            <div class="empty-state" id="emptyState">
-              <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01" stroke-width="2.5"/></svg></div>
-              <h3>准备预览</h3>
-              <p>在左侧面板粘贴公众号 HTML<br/>或拖拽 .html 文件至此</p>
-            </div>
-          </div>
+	  <div class="content" id="content">
+	    <div class="empty-state" id="emptyState">
+	      <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01" stroke-width="2.5"/></svg></div>
+	      <h3>准备预览</h3>
+	      <p>在左侧面板粘贴公众号 HTML<br/>或拖拽 .html 文件至此</p>
+	    </div>
+	  </div>
           <div class="scroll-fade" id="scrollFade"></div>
           <div class="homebar"></div>
         </div>
@@ -234,15 +234,7 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- 
-  ═════════════════════════════════════════════════════════════
-  AI 注入点：排版生成的 HTML 内容填入下方 <script> 标签内
-  页面 JS 会自动读取并渲染到手机框预览中
-  
-  用法：将 output.html 的完整内容替换 __CONTENT__ 即可
-  注意：若内容含 </script> 需替换为 <\/script>
-  ═════════════════════════════════════════════════════════════
--->
+<!-- 排版 HTML 数据注入点（AI 生成时替换此处内容） -->
 <script id="article-data" type="text/x-template">__CONTENT__</script>
 
 <script>

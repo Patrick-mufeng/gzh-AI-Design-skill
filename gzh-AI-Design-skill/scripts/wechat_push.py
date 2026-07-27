@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WeChatPost 公众号推送脚本
+gzh-AI-Design 公众号推送脚本
 将排版后的文章推送到微信公众号草稿箱。
 
 用法:

@@ -61,20 +61,22 @@
 
 ## 安装与使用
 
-### 方式一：AI 编码助手（推荐）
+### 方式一：一句话安装（推荐）
 
-Claude Code / Cursor / Codex / ZCode — 将 `gzh-AI-Design-skill/` 放入项目，对 AI 说：
+对 AI 说：
 
 ```
-帮我排版 + 粘贴文章内容
-或：排版 + 推送 一条龙
+帮我安装这个 skill：https://github.com/Patrick-mufeng/gzh-AI-Design-skill
 ```
 
-AI 自动按 `SKILL.md` 定义的工作流执行：读取 → 分析 → 选主题 → 读规范 → 生成 HTML → 校验 → 预览。
+AI 会自动拉取项目、安装到 skills 目录、完成配置。之后直接说「帮我排版」即可使用。
 
-### 方式二：对话型 AI
+### 方式二：手动下载安装
 
-ChatGPT / Kimi / 豆包 / Gemini — 复制核心规则作为 prompt 前缀，提供 Markdown 文章，AI 输出 HTML。
+1. 下载项目 ZIP 并解压
+2. 将 `gzh-AI-Design-skill/` 文件夹放入 AI 工具的 skills 目录
+3. 对 AI 说「帮我安装刚下载的 gzh-AI-Design-skill」
+4. 安装完成后说「帮我排版 + 文章内容」
 
 ### 方式三：纯手动
 
